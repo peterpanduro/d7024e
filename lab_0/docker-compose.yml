@@ -1,0 +1,7 @@
+services:
+  node:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    deploy:
+      replicas: 50
