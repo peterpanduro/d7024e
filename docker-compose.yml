@@ -1,0 +1,18 @@
+services:
+  node:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    deploy:
+      mode: replicated
+      replicas: 2
+      # restart_policy:
+      #   condition: on-failure
+      #   delay: 5s
+      #   max_attempts: 3
+      #   window: 10s
+    networks:
+      - kademlianet
+
+networks:
+  kademlianet:
