@@ -1,0 +1,11 @@
+run:
+    go run main.go
+
+watch:
+    find . -name "*.go" | entr -cr go run main.go
+
+test:
+    go test -v ./...
+
+test-watch:
+    find . -name "*.go" | entr -cr go test -v ./...
