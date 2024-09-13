@@ -11,7 +11,7 @@ func Ping(c *gin.Context, state *state.State) {
 	response := models.Message{
 		Sender:   state.ID.String(),
 		Receiver: c.Param("sender"),
-		Type:     models.PONG,
+		Type:     models.ACK,
 		Data:     nil,
 	}
 	c.JSON(http.StatusOK, response)

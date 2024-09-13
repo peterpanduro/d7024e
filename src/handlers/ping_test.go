@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"d7024e/kademlia"
-	"d7024e/models" // Import the models package where Message is defined
+	"d7024e/models"
 	"d7024e/state"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
@@ -24,7 +24,7 @@ func TestPing(t *testing.T) {
 
 	// Wrap the Ping handler with the appState
 	router.GET("/ping", func(c *gin.Context) {
-		Ping(c, appState) // Pass the appState to the handler
+		Ping(c, appState)
 	})
 
 	// Create an HTTP request to test the Ping handler
@@ -46,7 +46,7 @@ func TestPing(t *testing.T) {
 	expectedResponse := models.Message{
 		Sender:   mockID.String(),
 		Receiver: "",
-		Type:     models.PONG,
+		Type:     models.ACK,
 		Data:     nil,
 	}
 
@@ -54,7 +54,7 @@ func TestPing(t *testing.T) {
 	expectedJSON := `{
 		"sender": "` + expectedResponse.Sender + `",
 		"receiver": "",
-		"msgType": "PONG",
+		"msgType": "ACK",
 		"data": null
 	}`
 

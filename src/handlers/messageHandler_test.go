@@ -63,7 +63,7 @@ func TestMessageHandler_Ping(t *testing.T) {
 	expectedResponse := `{
 		"sender": "` + mockReceiverID.String() + `",
 		"receiver": "",
-		"msgType": "PONG",
+		"msgType": "ACK",
 		"data": null
 	}`
 
