@@ -1,14 +1,23 @@
 package main
 
 import (
-	"fmt"
 	"d7024e/handlers"
+	"d7024e/kademlia"
+	"d7024e/state"
+	"fmt"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
-	fmt.Println("Starting node")
+	id := kademlia.NewKademliaID(kademlia.NewRandomKademliaID().String())
+	state := &state.State{ID: id}
+	fmt.Println("Starting node", state)
 	r := gin.Default()
-	r.GET("/ping", handlers.Ping)
+	r.GET("/", func(c *gin.Context) {
+		handlers.MessageHandler(c, state)
+	})
+	r.GET("/ping", func(c *gin.Context) {
+		handlers.Ping(c, state)
+	})
 	r.Run()
 }

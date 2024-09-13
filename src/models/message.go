@@ -1,12 +1,12 @@
 package models
 
-type RPC struct {
+type Message struct {
 	// Sender   Contact `json:"sender"`
 	Sender   string `json:"sender"`
 	// Receiver Contact `json:"receiver"`
 	Receiver string `json:"receiver"`
 	Type     MsgType `json:"msgType"`
-	Data     MsgData `json:"data"`
+	Data     *MsgData `json:"data"`
 }
 
 type MsgData struct {
