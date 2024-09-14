@@ -1,12 +1,12 @@
 package models
 
+import "d7024e/kademlia"
+
 type Message struct {
-	// Sender   Contact `json:"sender"`
-	Sender string `json:"sender"`
-	// Receiver Contact `json:"receiver"`
-	Receiver string   `json:"receiver"`
-	Type     MsgType  `json:"msgType"`
-	Data     *MsgData `json:"data"`
+	Sender   *kademlia.Contact `json:"sender"`
+	Receiver *kademlia.Contact `json:"receiver"`
+	Type     MsgType           `json:"msgType"`
+	Data     *MsgData          `json:"data"`
 }
 
 type MsgData struct {

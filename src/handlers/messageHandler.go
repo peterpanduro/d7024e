@@ -11,14 +11,16 @@ import (
 func MessageHandler(c *gin.Context, state *state.State) {
 	var message models.Message
 	if err := c.ShouldBindJSON(&message); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid message format"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid message format",
+		})
 		return
 	}
 
 	switch message.Type {
 	case models.PING:
-		Ping(c, state)
+		Ping(c, state, &message)
 	default:
-		c.JSON(http.StatusOK, gin.H{"error": "invalid message type"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid message type"})
 	}
 }
