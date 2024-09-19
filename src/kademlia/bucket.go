@@ -19,7 +19,7 @@ func newBucket() *bucket {
 
 // AddContact adds the Contact to the front of the bucket
 // or moves it to the front of the bucket if it already existed
-func (bucket *bucket) AddContact(contact Contact) {
+func (bucket *bucket) AddContact(contact *Contact) {
 	var element *list.Element
 	for e := bucket.list.Front(); e != nil; e = e.Next() {
 		nodeID := e.Value.(Contact).ID
@@ -44,9 +44,9 @@ func (bucket *bucket) GetContactAndCalcDistance(target *KademliaID) []Contact {
 	var contacts []Contact
 
 	for elt := bucket.list.Front(); elt != nil; elt = elt.Next() {
-		contact := elt.Value.(Contact)
+		contact := elt.Value.(*Contact)
 		contact.CalcDistance(target)
-		contacts = append(contacts, contact)
+		contacts = append(contacts, *contact)
 	}
 
 	return contacts

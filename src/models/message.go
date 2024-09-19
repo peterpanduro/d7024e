@@ -10,12 +10,9 @@ type Message struct {
 }
 
 type MsgData struct {
-	STORE []byte `json:"store"`
-	HASH  string `json:"hash"`
-	// NODE  KademliaID        `json:"node"`
-	// NODES ContactCandidates `json:"nodes"`
-	VALUE []byte `json:"value"`
-	ERR   string `json:"err"`
+	HASH  *string `json:"hash"`
+	VALUE *[]byte `json:"value"`
+	ERR   *string `json:"err"`
 }
 
 type MsgType string
@@ -23,6 +20,7 @@ type MsgType string
 const (
 	PING        MsgType = "PING"
 	ACK         MsgType = "ACK"
+	JOIN        MsgType = "JOIN"
 	STORE       MsgType = "STORE"
 	STORED      MsgType = "STORED"
 	FIND_NODE   MsgType = "FIND_NODE"

@@ -6,12 +6,12 @@ const bucketSize = 20
 // RoutingTable definition
 // keeps a refrence contact of me and an array of buckets
 type RoutingTable struct {
-	me      Contact
+	me      *Contact
 	buckets [IDLength * 8]*bucket
 }
 
 // NewRoutingTable returns a new instance of a RoutingTable
-func NewRoutingTable(me Contact) *RoutingTable {
+func NewRoutingTable(me *Contact) *RoutingTable {
 	routingTable := &RoutingTable{}
 	for i := 0; i < IDLength*8; i++ {
 		routingTable.buckets[i] = newBucket()
@@ -21,15 +21,16 @@ func NewRoutingTable(me Contact) *RoutingTable {
 }
 
 // AddContact add a new contact to the correct Bucket
-func (routingTable *RoutingTable) AddContact(contact Contact) {
+func (routingTable *RoutingTable) AddContact(contact *Contact) {
 	bucketIndex := routingTable.getBucketIndex(contact.ID)
 	bucket := routingTable.buckets[bucketIndex]
 	bucket.AddContact(contact)
 }
 
 // FindClosestContacts finds the count closest Contacts to the target in the RoutingTable
-func (routingTable *RoutingTable) FindClosestContacts(target *KademliaID, count int) []Contact {
-	var candidates ContactCandidates
+func (routingTable *RoutingTable) FindClosestContacts(contact *Contact, count int) []Contact {
+	target := contact.ID
+	var candidates ContactCandidates = ContactCandidates{contacts: make([]Contact, 0)}
 	bucketIndex := routingTable.getBucketIndex(target)
 	bucket := routingTable.buckets[bucketIndex]
 

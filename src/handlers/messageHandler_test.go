@@ -23,7 +23,7 @@ func TestMessageHandler_Ping(t *testing.T) {
 	mockSender := kademlia.NewContact(kademlia.NewRandomKademliaID(), "127.0.0.1:8080")
 	mockReceiver := kademlia.NewContact(kademlia.NewRandomKademliaID(), "127.0.0.1:8081")
 	mockedState := state.State{
-		Node: &mockReceiver,
+		Node: mockReceiver,
 	}
 
 	router.POST("/", func(c *gin.Context) {
@@ -31,8 +31,8 @@ func TestMessageHandler_Ping(t *testing.T) {
 	})
 
 	message := models.Message{
-		Sender:   &mockSender,
-		Receiver: &mockReceiver,
+		Sender:   mockSender,
+		Receiver: mockReceiver,
 		Type:     models.PING,
 		Data:     nil,
 	}
@@ -56,8 +56,8 @@ func TestMessageHandler_Ping(t *testing.T) {
 
 	// Define the expected response as a Message struct
 	expectedResponse := models.Message{
-		Sender:   &mockReceiver,
-		Receiver: &mockSender,
+		Sender:   mockReceiver,
+		Receiver: mockSender,
 		Type:     models.ACK,
 		Data:     nil,
 	}
@@ -77,13 +77,12 @@ func TestMessageHandler_InvalidType(t *testing.T) {
 	gin.SetMode(gin.TestMode)
 	router := gin.Default()
 
-// Create a mock KademliaID and state for testing
+	// Create a mock KademliaID and state for testing
 	mockSender := kademlia.NewContact(kademlia.NewRandomKademliaID(), "127.0.0.1:8080")
 	mockReceiver := kademlia.NewContact(kademlia.NewRandomKademliaID(), "127.0.0.1:8081")
 	mockedState := state.State{
-		Node: &mockReceiver,
+		Node: mockReceiver,
 	}
-
 
 	// Replace the Ping handler with the MockPing for testing
 	router.POST("/", func(c *gin.Context) {
@@ -92,8 +91,8 @@ func TestMessageHandler_InvalidType(t *testing.T) {
 
 	// Create a sample message that simulates an invalid message type
 	message := models.Message{
-		Sender:   &mockSender,
-		Receiver: &mockReceiver,
+		Sender:   mockSender,
+		Receiver: mockReceiver,
 		Type:     models.MsgType("INVALID"),
 		Data:     nil,
 	}

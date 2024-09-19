@@ -21,7 +21,7 @@ func TestPingGet(t *testing.T) {
 
 	// Mock the state
 	mockReceiver := kademlia.NewContact(kademlia.NewRandomKademliaID(), "127.0.0.1:8080")
-	mockState := &state.State{Node: &mockReceiver}
+	mockState := &state.State{Node: mockReceiver}
 
 	// Wrap the Ping handler with the appState
 	router.GET("/ping", func(c *gin.Context) {
@@ -45,7 +45,7 @@ func TestPingGet(t *testing.T) {
 
 	// Define the expected response as a Message struct
 	expectedResponse := models.Message{
-		Sender:   &mockReceiver,
+		Sender:   mockReceiver,
 		Receiver: nil,
 		Type:     models.ACK,
 		Data:     nil,
@@ -69,7 +69,7 @@ func TestPingPost(t *testing.T) {
 	// Mock the state
 	mockReceiver := kademlia.NewContact(kademlia.NewRandomKademliaID(), "127.0.0.1:8080")
 	mockSender := kademlia.NewContact(kademlia.NewRandomKademliaID(), "127.0.0.1:8081")
-	mockState := &state.State{Node: &mockReceiver}
+	mockState := &state.State{Node: mockReceiver}
 
 	// Wrap the Ping handler with the appState
 	router.POST("/ping", func(c *gin.Context) {
@@ -77,8 +77,8 @@ func TestPingPost(t *testing.T) {
 	})
 
 	message := models.Message{
-		Sender:   &mockSender,
-		Receiver: &mockReceiver,
+		Sender:   mockSender,
+		Receiver: mockReceiver,
 		Type:     models.PING,
 		Data:     nil,
 	}
@@ -102,8 +102,8 @@ func TestPingPost(t *testing.T) {
 
 	// Define the expected response as a Message struct
 	expectedResponse := models.Message{
-		Sender:   &mockReceiver,
-		Receiver: &mockSender,
+		Sender:   mockReceiver,
+		Receiver: mockSender,
 		Type:     models.ACK,
 		Data:     nil,
 	}

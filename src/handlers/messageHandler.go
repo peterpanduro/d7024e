@@ -20,6 +20,8 @@ func MessageHandler(c *gin.Context, state *state.State) {
 	switch message.Type {
 	case models.PING:
 		Ping(c, state, &message)
+	case models.JOIN:
+		Join(c, state, &message)
 	default:
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid message type"})
 	}
