@@ -1,26 +1,26 @@
 package handlers
 
 import (
-	"d7024e/models"
-	"d7024e/state"
-	"github.com/gin-gonic/gin"
+	"d7024e/kademlia"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
-func HandlePing(c *gin.Context, state *state.State) {
+func HandlePing(c *gin.Context, routingTable *kademlia.RoutingTable) {
 	if c.Request.Method == http.MethodPost {
-		var message models.Message
+		var message kademlia.Message
 		if err := c.BindJSON(&message); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		Ping(c, state, &message)
+		Ping(c, routingTable, &message)
 	} else {
-		Ping(c, state, nil)
+		Ping(c, routingTable, nil)
 	}
 }
 
-func Ping(c *gin.Context, state *state.State, message *models.Message) {
+func Ping(c *gin.Context, routingTable *kademlia.RoutingTable, message *kademlia.Message) {
 	// POST request without message body
 	if message == nil && c.Request.Method != http.MethodGet {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing message body"})
@@ -29,10 +29,10 @@ func Ping(c *gin.Context, state *state.State, message *models.Message) {
 
 	// GET request
 	if message == nil {
-		response := models.Message{
-			Sender:   state.Node,
+		response := kademlia.Message{
+			Sender:   routingTable.Me,
 			Receiver: nil,
-			Type:     models.ACK,
+			Type:     kademlia.ACK,
 			Data:     nil,
 		}
 		c.JSON(http.StatusOK, response)
@@ -40,10 +40,10 @@ func Ping(c *gin.Context, state *state.State, message *models.Message) {
 	}
 
 	// Set the receiver to the message sender
-	response := models.Message{
-		Sender:   state.Node,
+	response := kademlia.Message{
+		Sender:   routingTable.Me,
 		Receiver: message.Sender,
-		Type:     models.ACK,
+		Type:     kademlia.ACK,
 		Data:     nil,
 	}
 	c.JSON(http.StatusOK, response)

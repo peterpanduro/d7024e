@@ -2,74 +2,68 @@ package handlers
 
 import (
 	"d7024e/kademlia"
-	"d7024e/models"
-	"d7024e/state"
-	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
 
-func HandleJoin(c *gin.Context, state *state.State) {
+func HandleJoin(c *gin.Context, routingTable *kademlia.RoutingTable) {
 	if c.Request.Method == http.MethodPost {
-		var message models.Message
+		var message kademlia.Message
 		if err := c.BindJSON(&message); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		Join(c, state, &message)
+		Join(c, routingTable, &message)
 	} else {
-		Join(c, state, nil)
+		Join(c, routingTable, nil)
 	}
 }
 
-func Join(c *gin.Context, state *state.State, message *models.Message) {
+func Join(c *gin.Context, routingTable *kademlia.RoutingTable, message *kademlia.Message) {
 	// POST request without message body
 	if message == nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing message body"})
 		return
 	}
 
-	if message.Type != models.JOIN {
+	if message.Type != kademlia.JOIN {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid message type"})
 		return
 	}
 
 	// Find the closest contacts to the sender
 	sender := message.Sender
-	println(sender)
-	closestContacts := state.RoutingTable.FindClosestContacts(sender, 5)
-	println(closestContacts)
+	closestContacts := routingTable.FindClosestContacts(sender, 5)
 
 	// Save the sender in the routing table
-	// state.RoutingTable.AddContact(sender)
+	routingTable.AddContact(sender)
 
 	// Set the receiver to the message sender
-	response := models.Message{
-		Sender:   state.Node,
+	response := kademlia.Message{
+		Sender:   routingTable.Me,
 		Receiver: message.Sender,
-		Type:     models.ACK,
+		Type:     kademlia.ACK,
 		Data:     nil,
 	}
 	c.JSON(http.StatusOK, response)
 
 	// Send FIND_NODE messages to the sender
-	// for _, contact := range closestContacts {
-	// 	//
-	// 	SendFindContactMessage(&contact, state.Node, sender)
-	// }
+	for _, contact := range closestContacts {
+		SendFindContactMessage(contact, routingTable.Me, sender)
+	}
 }
 
 func SendFindContactMessage(contact *kademlia.Contact, sender *kademlia.Contact, receiver *kademlia.Contact) {
 	bytes := contact.ID[:]
-	data := models.MsgData{
+	data := kademlia.MsgData{
 		VALUE: &bytes,
 	}
-	message := models.Message{
+	message := kademlia.Message{
 		Sender:   sender,
 		Receiver: receiver,
-		Type:     models.FIND_NODE,
+		Type:     kademlia.FIND_NODE,
 		Data:     &data,
 	}
-	fmt.Println(message)
+	kademlia.SendMessage(message)
 }

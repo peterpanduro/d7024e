@@ -1,24 +1,35 @@
 package kademlia
 
-type Network struct {
-}
+import (
+	"encoding/json"
+	"net"
+)
 
-func Listen(ip string, port int) {
-	// TODO
-}
+// Serialize the message to JSON
+func SendMessage(message Message) error {
+	data, err := json.Marshal(message)
+	if err != nil {
+		return err
+	}
 
-func (network *Network) SendPingMessage(contact *Contact) {
-	// TODO
-}
+	// Resolve the receiver's address
+	addr, err := net.ResolveUDPAddr("udp", message.Receiver.Address)
+	if err != nil {
+		return err
+	}
 
-func (network *Network) SendFindContactMessage(contact *Contact) {
-	// TODO
-}
+	// Create a UDP connection
+	conn, err := net.DialUDP("udp", nil, addr)
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
 
-func (network *Network) SendFindDataMessage(hash string) {
-	// TODO
-}
+	// Send the message
+	_, err = conn.Write(data)
+	if err != nil {
+		return err
+	}
 
-func (network *Network) SendStoreMessage(data []byte) {
-	// TODO
+	return nil
 }

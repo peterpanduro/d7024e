@@ -3,8 +3,6 @@ package handlers
 import (
 	"bytes"
 	"d7024e/kademlia"
-	"d7024e/models"
-	"d7024e/state"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -20,12 +18,11 @@ func TestPingGet(t *testing.T) {
 	router := gin.Default()
 
 	// Mock the state
-	mockReceiver := kademlia.NewContact(kademlia.NewRandomKademliaID(), "127.0.0.1:8080")
-	mockState := &state.State{Node: mockReceiver}
+	rt := setupRoutingTable()
 
 	// Wrap the Ping handler with the appState
 	router.GET("/ping", func(c *gin.Context) {
-		HandlePing(c, mockState)
+		HandlePing(c, rt)
 	})
 
 	// Create an HTTP request to test the Ping handler
@@ -44,10 +41,10 @@ func TestPingGet(t *testing.T) {
 	assert.Equal(t, http.StatusOK, w.Code)
 
 	// Define the expected response as a Message struct
-	expectedResponse := models.Message{
-		Sender:   mockReceiver,
+	expectedResponse := kademlia.Message{
+		Sender:   rt.Me,
 		Receiver: nil,
-		Type:     models.ACK,
+		Type:     kademlia.ACK,
 		Data:     nil,
 	}
 
@@ -67,19 +64,18 @@ func TestPingPost(t *testing.T) {
 	router := gin.Default()
 
 	// Mock the state
-	mockReceiver := kademlia.NewContact(kademlia.NewRandomKademliaID(), "127.0.0.1:8080")
+	rt := setupRoutingTable()
 	mockSender := kademlia.NewContact(kademlia.NewRandomKademliaID(), "127.0.0.1:8081")
-	mockState := &state.State{Node: mockReceiver}
 
 	// Wrap the Ping handler with the appState
 	router.POST("/ping", func(c *gin.Context) {
-		HandlePing(c, mockState)
+		HandlePing(c, rt)
 	})
 
-	message := models.Message{
+	message := kademlia.Message{
 		Sender:   mockSender,
-		Receiver: mockReceiver,
-		Type:     models.PING,
+		Receiver: rt.Me,
+		Type:     kademlia.PING,
 		Data:     nil,
 	}
 	messageJSON, err := json.Marshal(message)
@@ -100,11 +96,11 @@ func TestPingPost(t *testing.T) {
 	// Check the status code
 	assert.Equal(t, http.StatusOK, w.Code)
 
-	// Define the expected response as a Message struct
-	expectedResponse := models.Message{
-		Sender:   mockReceiver,
+	expectedResponse := kademlia.Message{
+		// Define the expected response as a Message struct
+		Sender:   rt.Me,
 		Receiver: mockSender,
-		Type:     models.ACK,
+		Type:     kademlia.ACK,
 		Data:     nil,
 	}
 

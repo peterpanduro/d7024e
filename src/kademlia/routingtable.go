@@ -2,11 +2,10 @@ package kademlia
 
 const bucketSize = 20
 
-
 // RoutingTable definition
 // keeps a refrence contact of me and an array of buckets
 type RoutingTable struct {
-	me      *Contact
+	Me      *Contact
 	buckets [IDLength * 8]*bucket
 }
 
@@ -16,22 +15,22 @@ func NewRoutingTable(me *Contact) *RoutingTable {
 	for i := 0; i < IDLength*8; i++ {
 		routingTable.buckets[i] = newBucket()
 	}
-	routingTable.me = me
+	routingTable.Me = me
 	return routingTable
 }
 
 // AddContact add a new contact to the correct Bucket
 func (routingTable *RoutingTable) AddContact(contact *Contact) {
-	bucketIndex := routingTable.getBucketIndex(contact.ID)
+	bucketIndex := routingTable.GetBucketIndex(contact.ID)
 	bucket := routingTable.buckets[bucketIndex]
 	bucket.AddContact(contact)
 }
 
 // FindClosestContacts finds the count closest Contacts to the target in the RoutingTable
-func (routingTable *RoutingTable) FindClosestContacts(contact *Contact, count int) []Contact {
+func (routingTable *RoutingTable) FindClosestContacts(contact *Contact, count int) []*Contact {
 	target := contact.ID
-	var candidates ContactCandidates = ContactCandidates{contacts: make([]Contact, 0)}
-	bucketIndex := routingTable.getBucketIndex(target)
+	var candidates ContactCandidates = ContactCandidates{contacts: make([]*Contact, 0)}
+	bucketIndex := routingTable.GetBucketIndex(target)
 	bucket := routingTable.buckets[bucketIndex]
 
 	candidates.Append(bucket.GetContactAndCalcDistance(target))
@@ -57,8 +56,8 @@ func (routingTable *RoutingTable) FindClosestContacts(contact *Contact, count in
 }
 
 // getBucketIndex get the correct Bucket index for the KademliaID
-func (routingTable *RoutingTable) getBucketIndex(id *KademliaID) int {
-	distance := id.CalcDistance(routingTable.me.ID)
+func (routingTable *RoutingTable) GetBucketIndex(id *KademliaID) int {
+	distance := id.CalcDistance(routingTable.Me.ID)
 	for i := 0; i < IDLength; i++ {
 		for j := 0; j < 8; j++ {
 			if (distance[i]>>uint8(7-j))&0x1 != 0 {

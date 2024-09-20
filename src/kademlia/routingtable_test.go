@@ -1,7 +1,6 @@
 package kademlia
 
 import (
-	// "fmt"
 	"testing"
 	"github.com/stretchr/testify/assert"
 )
@@ -9,7 +8,7 @@ import (
 func TestCreateRoutingTable(t *testing.T) {
 	me := NewContact(NewKademliaID("FFFFFFFF00000000000000000000000000000000"), "localhost:8000")
 	rt := NewRoutingTable(me)
-	assert.Equal(t, me, rt.me)
+	assert.Equal(t, me, rt.Me)
 }
 
 func TestRoutingTableAddFirstContact(t *testing.T) {

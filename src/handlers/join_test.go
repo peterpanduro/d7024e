@@ -3,37 +3,41 @@ package handlers
 import (
 	"bytes"
 	"d7024e/kademlia"
-	"d7024e/models"
-	"d7024e/state"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"strconv"
 	"testing"
 
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 )
 
-func setupRouter(state *state.State) *gin.Engine {
+func loadMockData(routingTable *kademlia.RoutingTable) {
+	for i := 0; i < 5; i++ {
+		contact := kademlia.NewContact(kademlia.NewRandomKademliaID(), "127.0.0.1:"+strconv.Itoa(8080+i))
+		routingTable.AddContact(contact)
+	}
+}
+
+func setupRouter(routingTable *kademlia.RoutingTable) *gin.Engine {
 	gin.SetMode(gin.TestMode)
 	r := gin.Default()
 	r.POST("/join", func(c *gin.Context) {
-		HandleJoin(c, state)
+		HandleJoin(c, routingTable)
 	})
 	return r
 }
 
-func setupState() *state.State {
+func setupRoutingTable() *kademlia.RoutingTable {
 	contact := kademlia.NewContact(kademlia.NewRandomKademliaID(), "127.0.0.1:8080")
-	routingTable := kademlia.NewRoutingTable(contact)
-	return &state.State{Node: contact, RoutingTable: routingTable}
+	return kademlia.NewRoutingTable(contact)
 }
 
 // Test for missing message body
 func TestJoin_MissingMessage(t *testing.T) {
-	state := setupState()
-
-	r := setupRouter(state)
+	rt := setupRoutingTable()
+	r := setupRouter(rt)
 
 	req, _ := http.NewRequest("POST", "/join", nil)
 	w := httptest.NewRecorder()
@@ -45,11 +49,11 @@ func TestJoin_MissingMessage(t *testing.T) {
 
 // Test for invalid message type
 func TestJoin_InvalidMessageType(t *testing.T) {
-	state := setupState()
-	r := setupRouter(state)
+	rt := setupRoutingTable()
+	r := setupRouter(rt)
 
-	message := models.Message{
-		Type: models.PING, // Invalid type
+	message := kademlia.Message{
+		Type: kademlia.PING, // Invalid type
 	}
 	jsonValue, _ := json.Marshal(message)
 
@@ -64,16 +68,14 @@ func TestJoin_InvalidMessageType(t *testing.T) {
 
 // Test for valid join request
 func TestJoin_ValidMessageReturnsACK(t *testing.T) {
-	state := setupState()
-	r := setupRouter(state)
+	rt := setupRoutingTable()
+	r := setupRouter(rt)
 
 	sender := kademlia.NewContact(kademlia.NewRandomKademliaID(), "127.0.0.1:8081")
-	state.RoutingTable.AddContact(sender)
-
-	message := models.Message{
-		Type:    models.JOIN,
-		Receiver: state.Node,
-		Sender:  sender,
+	message := kademlia.Message{
+		Type:     kademlia.JOIN,
+		Receiver: rt.Me,
+		Sender:   sender,
 	}
 	jsonValue, err := json.Marshal(message)
 	if err != nil {
@@ -93,10 +95,10 @@ func TestJoin_ValidMessageReturnsACK(t *testing.T) {
 	assert.Equal(t, http.StatusOK, w.Code)
 
 	// Define the expected response as a Message struct
-	expectedResponse := models.Message{
-		Sender:   state.Node,
+	expectedResponse := kademlia.Message{
+		Sender:   rt.Me,
 		Receiver: sender,
-		Type:     models.ACK,
+		Type:     kademlia.ACK,
 		Data:     nil,
 	}
 
@@ -108,4 +110,8 @@ func TestJoin_ValidMessageReturnsACK(t *testing.T) {
 
 	// Check the response body
 	assert.JSONEq(t, string(expectedResponseJSON), w.Body.String())
+}
+
+func TestJoin_JoinEndsUpInRoutingTable(t *testing.T) {
+	// TODO: Write tests after bucket is properly tested
 }
