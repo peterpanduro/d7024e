@@ -1,24 +1,26 @@
 package handlers
 
 import (
-	"d7024e/models"
-	"d7024e/state"
+	"d7024e/kademlia"
 	"net/http"
-
 	"github.com/gin-gonic/gin"
 )
 
-func MessageHandler(c *gin.Context, state *state.State) {
-	var message models.Message
+func MessageHandler(c *gin.Context, routingTable *kademlia.RoutingTable) {
+	var message kademlia.Message
 	if err := c.ShouldBindJSON(&message); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid message format"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "Invalid message format",
+		})
 		return
 	}
 
 	switch message.Type {
-	case models.PING:
-		Ping(c, state)
+	case kademlia.PING:
+		Ping(c, routingTable, &message)
+	case kademlia.JOIN:
+		Join(c, routingTable, &message)
 	default:
-		c.JSON(http.StatusOK, gin.H{"error": "invalid message type"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid message type"})
 	}
 }
