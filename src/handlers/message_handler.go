@@ -2,8 +2,8 @@ package handlers
 
 import (
 	"d7024e/kademlia"
-	"net/http"
 	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 func MessageHandler(c *gin.Context, routingTable *kademlia.RoutingTable) {
@@ -17,9 +17,20 @@ func MessageHandler(c *gin.Context, routingTable *kademlia.RoutingTable) {
 
 	switch message.Type {
 	case kademlia.PING:
-		Ping(c, routingTable, &message)
-	case kademlia.JOIN:
-		Join(c, routingTable, &message)
+		response, err := kademlia.Ping(routingTable, &message)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusOK, response)
+		return
+	case kademlia.FIND_NODE:
+		response, err := kademlia.FindNode(routingTable, &message)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		c.JSON(http.StatusOK, response)
 	default:
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid message type"})
 	}
