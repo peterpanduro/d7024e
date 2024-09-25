@@ -14,8 +14,8 @@ import (
 
 func TestFindNode_MissingMessage(t *testing.T) {
 	rt := kademlia.SetupRoutingTable()
-	r := gin.Default()
 	gin.SetMode(gin.TestMode)
+	r := gin.Default()
 	r.POST("/find_node", func(c *gin.Context) {
 		HandleFindNode(c, rt)
 	})
@@ -30,8 +30,8 @@ func TestFindNode_MissingMessage(t *testing.T) {
 
 func TestFindNode_InvalidMessageType(t *testing.T) {
 	rt := kademlia.SetupRoutingTable()
-	r := gin.Default()
 	gin.SetMode(gin.TestMode)
+	r := gin.Default()
 	r.POST("/find_node", func(c *gin.Context) {
 		HandleFindNode(c, rt)
 	})
