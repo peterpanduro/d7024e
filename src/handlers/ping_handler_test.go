@@ -1,3 +1,4 @@
+
 package handlers
 
 import (
@@ -18,7 +19,7 @@ func TestPingGet(t *testing.T) {
 	router := gin.Default()
 
 	// Mock the state
-	rt := setupRoutingTable()
+	rt := kademlia.SetupRoutingTable()
 
 	// Wrap the Ping handler with the appState
 	router.GET("/ping", func(c *gin.Context) {
@@ -64,7 +65,7 @@ func TestPingPost(t *testing.T) {
 	router := gin.Default()
 
 	// Mock the state
-	rt := setupRoutingTable()
+	rt := kademlia.SetupRoutingTable()
 	mockSender := kademlia.NewContact(kademlia.NewRandomKademliaID(), "127.0.0.1:8081")
 
 	// Wrap the Ping handler with the appState

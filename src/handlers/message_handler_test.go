@@ -18,7 +18,7 @@ func TestMessageHandler_Ping(t *testing.T) {
 	router := gin.Default()
 
 	// Create a mock KademliaID and state for testing
-	rt := setupRoutingTable()
+	rt := kademlia.SetupRoutingTable()
 	sender := kademlia.NewContact(kademlia.NewRandomKademliaID(), "127.0.0.1:8081")
 
 	router.POST("/", func(c *gin.Context) {
@@ -73,7 +73,7 @@ func TestMessageHandler_InvalidType(t *testing.T) {
 	router := gin.Default()
 
 	// Create a mock KademliaID and state for testing
-	rt := setupRoutingTable()
+	rt := kademlia.SetupRoutingTable()
 	sender := kademlia.NewContact(kademlia.NewRandomKademliaID(), "127.0.0.1:8081")
 
 	// Replace the Ping handler with the MockPing for testing
