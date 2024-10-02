@@ -2,11 +2,12 @@ package handlers
 
 import (
 	"d7024e/kademlia"
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
-func MessageHandler(c *gin.Context, routingTable *kademlia.RoutingTable) {
+func MessageHandler(c *gin.Context, routingTable kademlia.RoutingTable) {
 	var message kademlia.Message
 	if err := c.ShouldBindJSON(&message); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -15,23 +16,21 @@ func MessageHandler(c *gin.Context, routingTable *kademlia.RoutingTable) {
 		return
 	}
 
+	var handler kademlia.KademliaHandler
 	switch message.Type {
 	case kademlia.PING:
-		response, err := kademlia.Ping(routingTable, &message)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
-		c.JSON(http.StatusOK, response)
-		return
+		handler = kademlia.PingHandler{}
 	case kademlia.FIND_NODE:
-		response, err := kademlia.FindNode(routingTable, &message)
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
-		c.JSON(http.StatusOK, response)
+		handler = kademlia.FindNodeHandler{}
 	default:
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid message type"})
+		return
 	}
+
+	response, err := handler.Handle(routingTable, &message)
+	if err != nil {
+		c.JSON(err.Code, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, response)
 }

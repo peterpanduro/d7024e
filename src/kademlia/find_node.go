@@ -1,18 +1,21 @@
 package kademlia
 
 import (
-	"errors"
+	"d7024e/helpers"
+	"net/http"
 )
 
-func FindNode(routingTable *RoutingTable, message *Message) (*Message, error) {
+type FindNodeHandler struct {}
+func (findNode FindNodeHandler) Handle(routingTable RoutingTable, message *Message) (*Message, *helpers.HTTPError) {
+	return FindNode(routingTable, message)
+}
+
+func FindNode(routingTable RoutingTable, message *Message) (*Message, *helpers.HTTPError) {
 	if message == nil {
-		return nil, errors.New("Message is nil")
-	}
-	if routingTable == nil {
-		return nil, errors.New("Routing table is nil")
+		return nil, helpers.NewHTTPError(http.StatusInternalServerError, "Message is nil")
 	}
 	if message.Type != FIND_NODE {
-		return nil, errors.New("Message type is not FIND_NODE")
+		return nil, helpers.NewHTTPError(http.StatusBadRequest, "Invalid message type")
 	}
 
 	sender := message.Sender

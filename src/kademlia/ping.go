@@ -1,10 +1,16 @@
 package kademlia
 
 import (
-	"errors"
+	"d7024e/helpers"
+	"net/http"
 )
 
-func Ping(routingTable *RoutingTable, message *Message) (*Message, error) {
+type PingHandler struct {}
+func (ping PingHandler) Handle(routingTable RoutingTable, message *Message) (*Message, *helpers.HTTPError) {
+	return Ping(routingTable, message)
+}
+
+func Ping(routingTable RoutingTable, message *Message) (*Message, *helpers.HTTPError) {
 	if message == nil {
 		// GET method. No reciever.
 		response := &Message{
@@ -17,7 +23,7 @@ func Ping(routingTable *RoutingTable, message *Message) (*Message, error) {
 	}
 
 	if message.Type != PING {
-		return nil, errors.New("Invalid message type")
+		return nil, helpers.NewHTTPError(http.StatusBadRequest, "Invalid message type")
 	}
 
 	response := &Message{
