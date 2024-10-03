@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func HandleFindNode(c *gin.Context, routingTable *kademlia.RoutingTable) {
+func HandleFindNode(c *gin.Context, routingTable kademlia.RoutingTable) {
 	if c.Request.Method != http.MethodPost {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Only POST requests are allowed"})
 		return
