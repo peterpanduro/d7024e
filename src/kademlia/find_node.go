@@ -17,20 +17,25 @@ func FindNode(routingTable RoutingTable, message *Message) (*Message, *helpers.H
 	if message.Type != FIND_NODE {
 		return nil, helpers.NewHTTPError(http.StatusBadRequest, "Invalid message type")
 	}
+	FindNodeHash := message.Data.HASH
+	if FindNodeHash == nil {
+		return nil, helpers.NewHTTPError(http.StatusBadRequest, "No HASH Data in FIND_NODE message")
+	}
 
 	sender := message.Sender
-	// TODO: implement this
-	// closestContacts := routingTable.FindClosestContacts(sender, 5)
-
-	// Save the sender in the routing table
 	routingTable.AddContact(sender)
+
+	virtualContact := &Contact{ID: NewKademliaID(*FindNodeHash)}
+	closestContacts := routingTable.FindClosestContacts(virtualContact, 1)
+	closestContact := closestContacts[0]
+	ClosestContactHash := closestContact.ID.String()
 
 	// Set the receiver to the message sender
 	response := Message{
 		Sender:   routingTable.Me,
 		Receiver: message.Sender,
-		Type:     ACK,
-		Data:     nil,
+		Type:     FOUND_NODE,
+		Data:     &MsgData{HASH: &ClosestContactHash, VALUE: nil, ERR: nil},
 	}
 	return &response, nil
 }
