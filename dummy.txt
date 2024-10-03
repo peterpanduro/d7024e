@@ -1,1 +1,0 @@
-\d7024e-main\d7024e-main\src> go run main.go put C:\Users\A1202-admin\Downloads\d7024e-main\d7024e-main\dummy.txt
