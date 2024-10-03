@@ -4,8 +4,11 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"time"
+	"d7024e/helpers"
 )
-
+type KademliaHandler interface {
+	Handle(routingTable RoutingTable, message *Message) (*Message, *helpers.HTTPError)
+}
 // Kademlia represents the main Kademlia struct.
 type Kademlia struct {
 	routingTable *RoutingTable
