@@ -80,7 +80,7 @@ func (kademlia *Kademlia) LookupData(hash string) *MsgData {
 }
 
 // Store data in the network. It distributes the data to K nodes nearest to the hash of the data.
-func (kademlia *Kademlia) Store(data []byte) {
+func (kademlia *Kademlia) Store(data []byte) string {
 	// Generate the hash for the data to be stored
 	hash := GenerateHash(data)
 
@@ -110,6 +110,9 @@ func (kademlia *Kademlia) Store(data []byte) {
 			// Simulate acknowledgment handling (placeholder for now)
 		}(contact)
 	}
+
+	// Return the hash of the stored data
+	return hash
 }
 
 // GenerateHash is a function to generate the hash of the data.
