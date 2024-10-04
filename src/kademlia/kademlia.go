@@ -10,7 +10,7 @@ import (
 // KademliaHandler interface defines the method signature required for handling messages.
 type KademliaHandler interface {
 	Handle(routingTable RoutingTable, message *Message) (*Message, *helpers.HTTPError)
-}
+} 
 
 // Kademlia represents the main Kademlia struct.
 type Kademlia struct {
@@ -23,33 +23,6 @@ func NewKademlia(contact *Contact) *Kademlia {
 	return &Kademlia{
 		routingTable: NewRoutingTable(contact),
 		storage:      make(map[string][]byte),
-	}
-}
-
-// Handle processes incoming messages based on the message type.
-func (kademlia *Kademlia) Handle(routingTable RoutingTable, message *Message) (*Message, *helpers.HTTPError) {
-	switch message.Type {
-	case FIND_NODE:
-		// Lookup the closest contacts for the given contact
-		closestContacts := kademlia.LookupContact(message.Sender)
-		return &Message{Contacts: closestContacts}, nil
-
-	case FIND_VALUE:
-		// Lookup data based on the provided hash
-		data := kademlia.LookupData(*message.Data.HASH)
-		if data == nil {
-			return nil, &helpers.HTTPError{Message: "Data not found"}
-		}
-		return &Message{Data: data}, nil
-
-	case STORE:
-		// Store the data locally
-		kademlia.Store(*message.Data.VALUE)
-		return &Message{Ack: true}, nil
-
-	default:
-		// Handle unknown message types
-		return nil, &helpers.HTTPError{Message: "Unknown message type"}
 	}
 }
 
@@ -91,7 +64,7 @@ func (kademlia *Kademlia) LookupData(hash string) *MsgData {
 			}
 
 			// Simulate receiving data from the contact (placeholder logic)
-			mockData := []byte("mock data")
+			mockData := []byte("mock data") // Assign the byte slice to a variable
 			receivedData := &MsgData{HASH: &hash, VALUE: &mockData}
 			responseChan <- receivedData
 		}(contact)
@@ -106,7 +79,7 @@ func (kademlia *Kademlia) LookupData(hash string) *MsgData {
 	}
 }
 
-// Store adds data to the local storage and broadcasts the store message to the closest contacts.
+// Store data in the network. It distributes the data to K nodes nearest to the hash of the data.
 func (kademlia *Kademlia) Store(data []byte) {
 	// Generate the hash for the data to be stored
 	hash := GenerateHash(data)
@@ -139,7 +112,7 @@ func (kademlia *Kademlia) Store(data []byte) {
 	}
 }
 
-// GenerateHash generates the SHA-256 hash of the provided data.
+// GenerateHash is a function to generate the hash of the data.
 func GenerateHash(data []byte) string {
 	// Create a new SHA-256 hash object
 	hash := sha256.New()
