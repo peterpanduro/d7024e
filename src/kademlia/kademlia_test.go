@@ -10,7 +10,7 @@ func TestNewKademlia(t *testing.T) {
 	contact := NewContact(NewRandomKademliaID(), "127.0.0.1:8080")
 	kademlia := NewKademlia(contact)
 
-	if kademlia == nil || kademlia.routingTable == nil {
+	if kademlia == nil {
 		t.Errorf("NewKademlia() did not initialize properly")
 	}
 }

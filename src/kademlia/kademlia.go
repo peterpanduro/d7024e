@@ -1,20 +1,19 @@
 package kademlia
 
-<<<<<<< HEAD
-import "d7024e/helpers"
-
-type KademliaHandler interface {
-	Handle(routingTable RoutingTable, message *Message) (*Message, *helpers.HTTPError)
-=======
 import (
 	"crypto/sha256"
+	"d7024e/helpers"
 	"encoding/hex"
 	"time"
 )
 
+type KademliaHandler interface {
+	Handle(routingTable RoutingTable, message *Message) (*Message, *helpers.HTTPError)
+}
+
 // Kademlia represents the main Kademlia struct.
 type Kademlia struct {
-	routingTable *RoutingTable
+	routingTable RoutingTable
 	storage      map[string][]byte // Simple in-memory storage for data
 }
 
@@ -128,5 +127,4 @@ func GenerateHash(data []byte) string {
 
 	// Convert the hash to a hexadecimal string
 	return hex.EncodeToString(hashSum)
->>>>>>> 8468e03 (Update kademlia.go)
 }
