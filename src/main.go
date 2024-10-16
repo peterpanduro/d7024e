@@ -33,10 +33,12 @@ import (
 package main
 
 import (
+	"bufio"
 	"d7024e/kademlia"
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strings"
 )
 
 func main() {
@@ -46,36 +48,64 @@ func main() {
 	// Create a new instance of Kademlia
 	kad := kademlia.NewKademlia(contact)
 
-	// Handle CLI arguments
-	if len(os.Args) < 2 {
-		fmt.Println("Usage: put <file_path>")
-		return
-	}
+	reader := bufio.NewReader(os.Stdin)
 
-	command := os.Args[1]
+	for {
+		// Prompt the user for a command
+		fmt.Print("> ")
+		commandLine, _ := reader.ReadString('\n')
+		commandLine = strings.TrimSpace(commandLine)
+		args := strings.Split(commandLine, " ")
 
-	switch command {
-	case "put":
-		if len(os.Args) < 3 {
-			fmt.Println("Please provide a file path to upload")
-			return
+		if len(args) < 1 {
+			continue
 		}
 
-		filePath := os.Args[2]
-		// Read the file content
-		content, err := ioutil.ReadFile(filePath)
-		if err != nil {
-			fmt.Println("Error reading the file:", err)
-			return
+		command := args[0]
+
+		switch command {
+		case "put":
+			if len(args) < 2 {
+				fmt.Println("Please provide a file path to upload")
+				continue
+			}
+
+			filePath := args[1]
+			content, err := ioutil.ReadFile(filePath)
+			if err != nil {
+				fmt.Println("Error reading the file:", err)
+				continue
+			}
+
+			// Store the content using Kademlia and get the hash
+			hash := kad.Store(content)
+			fmt.Printf("File uploaded successfully. Hash: %s\n", hash)
+
+		case "get":
+			if len(args) < 2 {
+				fmt.Println("Please provide a hash to retrieve")
+				continue
+			}
+
+			hash := args[1]
+			// Lookup the data using the Kademlia network
+			data := kad.LookupData(hash)
+
+			if data == nil {
+				fmt.Println("Data not found for the given hash")
+				continue
+			}
+
+			// Output the retrieved data
+			fmt.Printf("Data retrieved: %s\n", string(*data.VALUE))
+			fmt.Printf("Retrieved from hash: %s\n", *data.HASH)
+
+		case "exit":
+			fmt.Println("Terminating the node.")
+			os.Exit(0) // Gracefully exit the program
+
+		default:
+			fmt.Println("Invalid command")
 		}
-
-		// Store the content using Kademlia and get the hash
-		hash := kad.Store(content)
-
-		// Output the hash of the object
-		fmt.Printf("File uploaded successfully. Hash: %s\n", hash)
-
-	default:
-		fmt.Println("Invalid command")
 	}
 }
