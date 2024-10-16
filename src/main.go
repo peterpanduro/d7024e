@@ -54,58 +54,62 @@ func main() {
 		// Prompt the user for a command
 		fmt.Print("> ")
 		commandLine, _ := reader.ReadString('\n')
-		commandLine = strings.TrimSpace(commandLine)
-		args := strings.Split(commandLine, " ")
+		handleCommand(commandLine, kad)
+	}
+}
 
-		if len(args) < 1 {
-			continue
+func handleCommand(commandLine string, kad *kademlia.Kademlia) {
+	commandLine = strings.TrimSpace(commandLine)
+	args := strings.Split(commandLine, " ")
+
+	if len(args) < 1 {
+		return
+	}
+
+	command := args[0]
+
+	switch command {
+	case "put":
+		if len(args) < 2 {
+			fmt.Println("Please provide a file path to upload")
+			return
 		}
 
-		command := args[0]
-
-		switch command {
-		case "put":
-			if len(args) < 2 {
-				fmt.Println("Please provide a file path to upload")
-				continue
-			}
-
-			filePath := args[1]
-			content, err := ioutil.ReadFile(filePath)
-			if err != nil {
-				fmt.Println("Error reading the file:", err)
-				continue
-			}
-
-			// Store the content using Kademlia and get the hash
-			hash := kad.Store(content)
-			fmt.Printf("File uploaded successfully. Hash: %s\n", hash)
-
-		case "get":
-			if len(args) < 2 {
-				fmt.Println("Please provide a hash to retrieve")
-				continue
-			}
-
-			hash := args[1]
-			// Lookup the data using the Kademlia network
-			data := kad.LookupData(hash)
-
-			if data == nil {
-				fmt.Println("Data not found for the given hash")
-				continue
-			}
-
-			// Output the retrieved data
-			fmt.Printf("Data retrieved: %s\n", string(*data.VALUE))
-			fmt.Printf("Retrieved from hash: %s\n", *data.HASH)
-
-		case "exit":
-			fmt.Println("Terminating the node.")
-			os.Exit(0) // Gracefully exit the program
-
-		default:
-			fmt.Println("Invalid command")
+		filePath := args[1]
+		content, err := ioutil.ReadFile(filePath)
+		if err != nil {
+			fmt.Println("Error reading the file:", err)
+			return
 		}
+
+		// Store the content using Kademlia and get the hash
+		hash := kad.Store(content)
+		fmt.Printf("File uploaded successfully. Hash: %s\n", hash)
+
+	case "get":
+		if len(args) < 2 {
+			fmt.Println("Please provide a hash to retrieve")
+			return
+		}
+
+		hash := args[1]
+		// Lookup the data using the Kademlia network
+		data := kad.LookupData(hash)
+
+		if data == nil {
+			fmt.Println("Data not found for the given hash")
+			return
+		}
+
+		// Output the retrieved data
+		fmt.Printf("Data retrieved: %s\n", string(*data.VALUE))
+		fmt.Printf("Retrieved from hash: %s\n", *data.HASH)
+
+	case "exit":
+		fmt.Println("Terminating the node.")
+		os.Exit(0) // Gracefully exit the program
+
+	default:
+		fmt.Println("Invalid command")
 	}
 }
