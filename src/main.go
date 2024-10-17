@@ -1,49 +1,21 @@
-/*
-	package main
-
-import (
-
-	"d7024e/handlers"
-	"d7024e/kademlia"
-	"log"
-	"os"
-
-	"github.com/gin-gonic/gin"
-
-)
-
-	func main() {
-		contact := kademlia.NewContact(kademlia.NewRandomKademliaID(), "127.0.0.1:8080")
-		routingTable := kademlia.NewRoutingTable(contact)
-
-		fmt.Println("Starting node", routingTable)
-		r := gin.Default()
-		r.POST("", func(c *gin.Context) {
-			handlers.MessageHandler(c, routingTable)
-		})
-		r.GET("/ping", func(c *gin.Context) {
-			handlers.HandlePing(c, routingTable)
-		})
-		r.POST("/ping", func(c *gin.Context) {
-			handlers.HandlePing(c, routingTable)
-		})
-		r.Run()
-	}
-*/
 package main
 
 import (
 	"bufio"
 	"d7024e/kademlia"
 	"fmt"
-	"io/ioutil"
+	"log"
 	"os"
 	"strings"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
 	// Create a contact for the Kademlia network
-	contact := kademlia.NewContact(kademlia.NewRandomKademliaID(), "127.0.0.1:8080")
+	host := initHost()
+	contact := kademlia.NewContact(kademlia.NewRandomKademliaID(), host)
+	log.Println("Node initialized:", contact)
 
 	// Create a new instance of Kademlia
 	kad := kademlia.NewKademlia(contact)
@@ -56,6 +28,23 @@ func main() {
 		commandLine, _ := reader.ReadString('\n')
 		handleCommand(commandLine, kad)
 	}
+}
+
+func initHost() string {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+	hostname, err := os.Hostname()
+	if err != nil {
+		log.Fatal("Couldn't get hostname")
+	}
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	host := hostname + ":" + port
+	return host
 }
 
 func handleCommand(commandLine string, kad *kademlia.Kademlia) {
@@ -76,7 +65,7 @@ func handleCommand(commandLine string, kad *kademlia.Kademlia) {
 		}
 
 		filePath := args[1]
-		content, err := ioutil.ReadFile(filePath)
+		content, err := os.ReadFile(filePath)
 		if err != nil {
 			fmt.Println("Error reading the file:", err)
 			return

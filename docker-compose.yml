@@ -1,4 +1,18 @@
 services:
+  bootstrap:
+    container_name: bootstrap
+    hostname: bootstrap
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
+    restart: on-failure
+    stdin_open: true
+    tty: true
+    networks:
+      - kademlianet
+
   node:
     build:
       context: .
@@ -6,11 +20,15 @@ services:
     deploy:
       mode: replicated
       replicas: 2
-      # restart_policy:
-      #   condition: on-failure
-      #   delay: 5s
-      #   max_attempts: 3
-      #   window: 10s
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 10s
+    depends_on:
+      - bootstrap
+    stdin_open: true
+    tty: true
     networks:
       - kademlianet
 
