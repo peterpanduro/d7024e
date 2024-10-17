@@ -3,8 +3,8 @@ package kademlia
 type Message struct {
 	Sender   *Contact `json:"sender"`
 	Receiver *Contact `json:"receiver"`
-	Type     MsgType  `json:"msgType"`
-	Data     *MsgData `json:"data"`
+	Type     MsgType           `json:"msgType"`
+	Data     *MsgData          `json:"data"`
 }
 
 type MsgData struct {

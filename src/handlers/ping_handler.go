@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func HandlePing(c *gin.Context, routingTable *kademlia.RoutingTable) {
+func HandlePing(c *gin.Context, routingTable kademlia.RoutingTable) {
 	if c.Request.Method != http.MethodPost {
 		response, err := kademlia.Ping(routingTable, nil)
 		if err != nil {

@@ -47,5 +47,5 @@ func TestFindNode_InvalidMessageType(t *testing.T) {
 	r.ServeHTTP(w, req)
 
 	assert.Equal(t, http.StatusBadRequest, w.Code)
-	assert.JSONEq(t, `{"error": "Message type is not FIND_NODE"}`, w.Body.String())
+	assert.JSONEq(t, `{"error": "Invalid message type"}`, w.Body.String())
 }
